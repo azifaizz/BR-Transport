@@ -36,18 +36,16 @@ function DeletedBillsPage() {
   }, []);
 
   const handleRestore = async (id: string) => {
-    if (confirm("Are you sure you want to restore this bill?")) {
-      // Optimistic UI Update: immediately remove it from state so it feels instant
-      setBills(prev => prev.filter(b => b.id !== id));
-      
-      try {
-        await billsApi.restoreBill(id);
-        toast.success("Bill restored successfully");
-      } catch (error) {
-        toast.error("Failed to restore bill");
-        // Revert on error
-        fetchDeletedBills();
-      }
+    // Optimistic UI Update: immediately remove it from state so it feels instant
+    setBills(prev => prev.filter(b => b.id !== id));
+    
+    try {
+      await billsApi.restoreBill(id);
+      toast.success("Bill restored successfully");
+    } catch (error) {
+      toast.error("Failed to restore bill");
+      // Revert on error
+      fetchDeletedBills();
     }
   };
 

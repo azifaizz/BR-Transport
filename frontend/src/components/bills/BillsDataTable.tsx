@@ -41,6 +41,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { ThermalReceipt } from "./ThermalReceipt";
 
 interface BillsDataTableProps {
@@ -62,6 +72,7 @@ export function BillsDataTable({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [viewBill, setViewBill] = useState<Bill | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ type: 'delete' | 'restore'; bill: Bill } | null>(null);
 
   const columns = useMemo<ColumnDef<Bill>[]>(() => {
     const baseColumns: ColumnDef<Bill>[] = [
@@ -191,7 +202,7 @@ export function BillsDataTable({
                 variant="default"
                 size="icon"
                 title="Restore"
-                onClick={() => onRestore?.(bill.id!)}
+                onClick={() => setConfirmAction({ type: 'restore', bill })}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
                 <RotateCcw className="h-4 w-4" />
@@ -201,7 +212,7 @@ export function BillsDataTable({
                 variant="destructive"
                 size="icon"
                 title="Delete"
-                onClick={() => onDelete?.(bill.id!)}
+                onClick={() => setConfirmAction({ type: 'delete', bill })}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -451,6 +462,51 @@ export function BillsDataTable({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Manual Custom Confirmation Dialog for Delete / Restore */}
+      <AlertDialog open={!!confirmAction} onOpenChange={(open) => !open && setConfirmAction(null)}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold flex items-center gap-2">
+              {confirmAction?.type === 'delete' ? (
+                <>
+                  <Trash2 className="h-5 w-5 text-destructive" />
+                  Confirm Delete Bill #{confirmAction?.bill.billNumber || confirmAction?.bill.id}
+                </>
+              ) : (
+                <>
+                  <RotateCcw className="h-5 w-5 text-green-600" />
+                  Confirm Restore Bill #{confirmAction?.bill.billNumber || confirmAction?.bill.id}
+                </>
+              )}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground pt-2 leading-relaxed">
+              {confirmAction?.type === 'delete'
+                ? `Are you sure you want to move Bill #${confirmAction?.bill.billNumber || ''} (${confirmAction?.bill.party || 'Challan'}) to the trash? It will be safely kept in the Deleted Bills tab for 15 days before permanent removal.`
+                : `Are you sure you want to restore Bill #${confirmAction?.bill.billNumber || ''} (${confirmAction?.bill.party || 'Challan'}) back to the active records list?`
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="pt-4">
+            <AlertDialogCancel onClick={() => setConfirmAction(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmAction?.type === 'delete') {
+                  onDelete?.(confirmAction.bill.id!);
+                } else if (confirmAction?.type === 'restore') {
+                  onRestore?.(confirmAction.bill.id!);
+                }
+                setConfirmAction(null);
+              }}
+              className={confirmAction?.type === 'delete' ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : "bg-green-600 hover:bg-green-700 text-white"}
+            >
+              {confirmAction?.type === 'delete' ? "Yes, Move to Trash" : "Yes, Restore Bill"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

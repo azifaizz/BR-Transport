@@ -38,18 +38,16 @@ function AllBillsPage() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this bill?")) {
-      // Optimistic UI Update: immediately remove it from state so it feels instant
-      setBills(prev => prev.filter(b => b.id !== id));
-      
-      try {
-        await billsApi.deleteBill(id);
-        toast.success("Bill deleted successfully");
-      } catch (error) {
-        toast.error("Failed to delete bill");
-        // Revert on error
-        fetchBills();
-      }
+    // Optimistic UI Update: immediately remove it from state so it feels instant
+    setBills(prev => prev.filter(b => b.id !== id));
+    
+    try {
+      await billsApi.deleteBill(id);
+      toast.success("Bill deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete bill");
+      // Revert on error
+      fetchBills();
     }
   };
 
