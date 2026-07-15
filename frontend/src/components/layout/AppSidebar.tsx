@@ -40,9 +40,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="border-b border-sidebar-border h-[72px] px-6 justify-center">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
-            <Truck className="h-5 w-5" />
-          </div>
+          <img src="/BR.png" alt="BR Transport Logo" className="h-9 w-9 rounded-md object-contain shrink-0" />
           <div className="flex flex-col">
             <span className="font-bold tracking-tight text-sidebar-foreground">BR Transport</span>
             <span className="text-[10px] font-medium text-sidebar-foreground/70 uppercase tracking-wider">Management</span>

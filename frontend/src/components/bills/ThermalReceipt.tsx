@@ -11,6 +11,7 @@ export const ThermalReceipt = React.memo(function ThermalReceipt({ bill }: Therm
   return (
     <div className="w-[80mm] min-h-[100mm] bg-white text-black p-4 font-mono text-sm print:w-full print:p-0 mx-auto">
       <div className="text-center mb-4">
+        <img src="/BR.png" alt="BR Transport Logo" className="h-12 w-auto mx-auto mb-1 object-contain" />
         <h2 className="text-lg font-bold mb-1 uppercase">Delivery challan</h2>
         {bill.billNumber && (
           <div className="text-sm font-bold mb-2">

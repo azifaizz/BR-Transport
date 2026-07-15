@@ -77,9 +77,7 @@ function LoginPage() {
       {/* Brand panel */}
       <div className="relative hidden overflow-hidden bg-sidebar text-sidebar-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-accent text-accent-foreground">
-            <Truck className="h-5 w-5" />
-          </div>
+          <img src="/BR.png" alt="BR Transport Logo" className="h-10 w-10 rounded-md object-contain bg-white/10 p-1 shrink-0" />
           <div>
             <p className="text-lg font-semibold tracking-tight">BR Transport</p>
             <p className="text-xs text-sidebar-foreground/70">Management System</p>
@@ -110,9 +108,7 @@ function LoginPage() {
       <div className="flex items-center justify-center px-6 py-12 sm:px-12">
         <div className="w-full max-w-sm">
           <div className="mb-8 flex items-center gap-3 lg:hidden">
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <Truck className="h-5 w-5" />
-            </div>
+            <img src="/BR.png" alt="BR Transport Logo" className="h-10 w-10 rounded-md object-contain shrink-0" />
             <div>
               <p className="text-base font-semibold">BR Transport</p>
               <p className="text-xs text-muted-foreground">Management System</p>

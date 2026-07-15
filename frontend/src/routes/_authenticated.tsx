@@ -38,9 +38,7 @@ function AuthenticatedLayout() {
         <header className="sticky top-0 z-50 flex h-14 md:hidden items-center gap-3 border-b bg-sidebar/95 backdrop-blur supports-[backdrop-filter]:bg-sidebar/60 px-4 shrink-0 shadow-sm">
           <SidebarTrigger className="text-sidebar-foreground" />
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
-              <Truck className="h-4 w-4" />
-            </div>
+            <img src="/BR.png" alt="BR Transport Logo" className="h-7 w-7 rounded-md object-contain shrink-0" />
             <div className="flex flex-col">
               <span className="text-sm font-bold tracking-tight text-sidebar-foreground">BR Transport</span>
             </div>
