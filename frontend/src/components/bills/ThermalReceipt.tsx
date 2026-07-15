@@ -11,7 +11,12 @@ export const ThermalReceipt = React.memo(function ThermalReceipt({ bill }: Therm
   return (
     <div className="w-[80mm] min-h-[100mm] bg-white text-black p-4 font-mono text-sm print:w-full print:p-0 mx-auto">
       <div className="text-center mb-4">
-        <h2 className="text-lg font-bold mb-2 uppercase">Delivery challan</h2>
+        <h2 className="text-lg font-bold mb-1 uppercase">Delivery challan</h2>
+        {bill.billNumber && (
+          <div className="text-sm font-bold mb-2">
+            BILL NO : #{bill.billNumber}
+          </div>
+        )}
         <div className="flex justify-between text-xs font-semibold">
           <span>Date : {bill.date}</span>
           <span>IN : {bill.inTime}</span>
