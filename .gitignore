@@ -43,3 +43,4 @@ buildNumber.properties
 *.njsproj
 *.sln
 *.sw?
+.firebase/

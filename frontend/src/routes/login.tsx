@@ -56,7 +56,7 @@ function LoginPage() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/bills/new" replace />;
   }
 
   const onSubmit = async (values: LoginValues) => {
@@ -64,7 +64,7 @@ function LoginPage() {
     try {
       await login(values.email, values.password);
       toast.success("Welcome back");
-      void navigate({ to: "/dashboard", replace: true });
+      void navigate({ to: "/bills/new", replace: true });
     } catch (err) {
       toast.error(extractApiError(err));
     } finally {

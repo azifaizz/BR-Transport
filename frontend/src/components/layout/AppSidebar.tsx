@@ -16,11 +16,6 @@ import {
 
 const items = [
   {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
     title: "All Bills",
     url: "/bills",
     icon: FileText,

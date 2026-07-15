@@ -9,7 +9,7 @@ export function ThermalReceipt({ bill }: ThermalReceiptProps) {
   if (!bill) return null;
 
   return (
-    <div className="w-[80mm] min-h-[100mm] bg-white text-black p-4 font-mono text-sm shadow-md print:shadow-none print:w-full print:p-0 mx-auto">
+    <div className="w-[80mm] min-h-[100mm] bg-white text-black p-4 font-mono text-sm print:w-full print:p-0 mx-auto">
       <div className="text-center mb-4">
         <h2 className="text-lg font-bold mb-2 uppercase">Delivery challan</h2>
         <div className="flex justify-between text-xs font-semibold">
@@ -55,21 +55,21 @@ export function ThermalReceipt({ bill }: ThermalReceiptProps) {
           <span className="w-24">Empty</span>
           <span className="px-2">:</span>
           <span className="flex-1 text-right font-semibold">
-            {bill.emptyWeight !== "" && bill.emptyWeight !== undefined && !isNaN(Number(bill.emptyWeight)) ? `${Number(bill.emptyWeight).toFixed(2)} MT` : ""}
+            {String(bill.emptyWeight) !== "" && bill.emptyWeight !== undefined && !isNaN(Number(bill.emptyWeight)) ? `${Number(bill.emptyWeight).toFixed(2)} MT` : ""}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="w-24">Load</span>
           <span className="px-2">:</span>
           <span className="flex-1 text-right font-semibold">
-            {bill.loadWeight !== "" && bill.loadWeight !== undefined && !isNaN(Number(bill.loadWeight)) ? `${Number(bill.loadWeight).toFixed(2)} MT` : ""}
+            {String(bill.loadWeight) !== "" && bill.loadWeight !== undefined && !isNaN(Number(bill.loadWeight)) ? `${Number(bill.loadWeight).toFixed(2)} MT` : ""}
           </span>
         </div>
         <div className="flex justify-between mt-2">
           <span className="w-24 font-bold">Net weight</span>
           <span className="px-2 font-bold">:</span>
           <span className="flex-1 text-right font-bold text-base">
-            {bill.netWeight !== "" && bill.netWeight !== undefined && !isNaN(Number(bill.netWeight)) ? `${Number(bill.netWeight).toFixed(2)} MT` : ""}
+            {String(bill.netWeight) !== "" && bill.netWeight !== undefined && !isNaN(Number(bill.netWeight)) ? `${Number(bill.netWeight).toFixed(2)} MT` : ""}
           </span>
         </div>
         <div className="flex justify-between mt-2">

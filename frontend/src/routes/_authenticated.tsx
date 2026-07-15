@@ -34,8 +34,8 @@ function AuthenticatedLayout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <div className="flex flex-1 flex-col overflow-hidden bg-muted/20 w-full">
-        <header className="flex h-14 md:hidden items-center gap-3 border-b bg-sidebar px-4 shrink-0">
+      <div className="flex flex-1 flex-col w-full min-h-screen bg-muted/20">
+        <header className="sticky top-0 z-50 flex h-14 md:hidden items-center gap-3 border-b bg-sidebar/95 backdrop-blur supports-[backdrop-filter]:bg-sidebar/60 px-4 shrink-0 shadow-sm">
           <SidebarTrigger className="text-sidebar-foreground" />
           <div className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
@@ -46,7 +46,7 @@ function AuthenticatedLayout() {
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto w-full">
+        <main className="flex-1 w-full">
           <Outlet />
         </main>
       </div>

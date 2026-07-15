@@ -17,6 +17,8 @@ export interface Bill {
   deliveryType: string;
   remarks?: string;
   printStatus?: boolean;
+  deletedAt?: string;
+  deletedBy?: string;
 }
 
 export const billsApi = {

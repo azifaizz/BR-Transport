@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
 function IndexRedirect() {
   const { isAuthenticated, isBootstrapping } = useAuth();
   if (isBootstrapping) return <FullPageLoader />;
-  return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
+  return <Navigate to={isAuthenticated ? "/bills/new" : "/login"} replace />;
 }
 
 function FullPageLoader() {
