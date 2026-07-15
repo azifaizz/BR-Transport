@@ -5,7 +5,7 @@ interface ThermalReceiptProps {
   bill: Bill;
 }
 
-export function ThermalReceipt({ bill }: ThermalReceiptProps) {
+export const ThermalReceipt = React.memo(function ThermalReceipt({ bill }: ThermalReceiptProps) {
   if (!bill) return null;
 
   return (
@@ -113,4 +113,4 @@ export function ThermalReceipt({ bill }: ThermalReceiptProps) {
       `}} />
     </div>
   );
-}
+});

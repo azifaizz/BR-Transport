@@ -108,20 +108,24 @@ public class BillService {
 
         if (firestore != null) {
             ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME)
-                    .orderBy("deletedAt", Query.Direction.DESCENDING).get();
+                    .whereEqualTo("isDeleted", true)
+                    .get();
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
             List<Bill> bills = new ArrayList<>();
             for (QueryDocumentSnapshot document : documents) {
                 Bill bill = document.toObject(Bill.class);
-                if (Boolean.TRUE.equals(bill.getIsDeleted())) {
-                    if (bill.getDeletedAt() != null && bill.getDeletedAt().before(cutoffDate)) {
-                        // Permanently remove bill older than 15 days
-                        firestore.collection(COLLECTION_NAME).document(bill.getId()).delete();
-                    } else {
-                        bills.add(bill);
-                    }
+                if (bill.getDeletedAt() != null && bill.getDeletedAt().before(cutoffDate)) {
+                    // Permanently remove bill older than 15 days
+                    firestore.collection(COLLECTION_NAME).document(bill.getId()).delete();
+                } else {
+                    bills.add(bill);
                 }
             }
+            // Sort descending by deletedAt in memory after fetching only the small subset of deleted bills
+            bills.sort((a, b) -> {
+                if (a.getDeletedAt() == null || b.getDeletedAt() == null) return 0;
+                return b.getDeletedAt().compareTo(a.getDeletedAt());
+            });
             return bills;
         } else {
             List<Bill> bills = new ArrayList<>();
