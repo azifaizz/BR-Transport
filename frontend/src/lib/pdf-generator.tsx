@@ -7,6 +7,7 @@ import { ThermalReceipt } from '@/components/bills/ThermalReceipt';
 import { toast } from 'sonner';
 
 export const downloadBillAsPdf = async (bill: Bill) => {
+  console.log("[PDF Debug] 1. Download button clicked, Bill object received:", bill);
   const toastId = toast.loading("Generating PDF...");
   
   // Create container behind the main app content with full opacity and exact coordinates
@@ -36,6 +37,7 @@ export const downloadBillAsPdf = async (bill: Bill) => {
     if (!element) {
       throw new Error("Receipt element not rendered");
     }
+    console.log("[PDF Debug] 2. Receipt element found and rendered:", element);
 
     // Convert any modern CSS colors (oklch, oklab, color-mix, etc.) into standard rgba
     // so html2canvas v1.4.1 can parse them without throwing an error.
@@ -88,14 +90,17 @@ export const downloadBillAsPdf = async (bill: Bill) => {
         const style = origGetComputedStyle.call(win, elt, pseudoElt);
         if (!style) return style;
         return new Proxy(style, {
-          get(target, prop, receiver) {
+          get(target, prop) {
             if (prop === 'getPropertyValue') {
               return function (propertyName: string) {
                 const val = target.getPropertyValue(propertyName);
                 return convertColorToRgba(val);
               };
             }
-            const val = Reflect.get(target, prop, receiver);
+            const val = Reflect.get(target, prop);
+            if (typeof val === 'function') {
+              return val.bind(target);
+            }
             if (typeof val === 'string' && typeof prop === 'string' && prop !== 'cssText') {
               return convertColorToRgba(val);
             }
@@ -137,9 +142,10 @@ export const downloadBillAsPdf = async (bill: Bill) => {
       });
     });
 
-    // Patch window.getComputedStyle to intercept pseudo-elements and style queries
+    // Patch window.getComputedStyle to intercept pseudo-elements and style queries without Proxy receiver issues
     const restoreMainWindow = patchGetComputedStyle(window);
 
+    console.log("[PDF Debug] 3. html2canvas started...");
     let canvas: HTMLCanvasElement;
     try {
       canvas = await html2canvas(element, {
@@ -167,13 +173,33 @@ export const downloadBillAsPdf = async (bill: Bill) => {
                   (el.style as any)[prop] = convertColorToRgba(val);
                 }
               });
-              // Inline typography and spacing so removing external style sheets does not break layout
+              // Inline typography, layout, and box-model so removing external style sheets does not break geometry
               el.style.fontFamily = comp.fontFamily || 'monospace';
               el.style.fontSize = comp.fontSize || '14px';
               el.style.fontWeight = comp.fontWeight || 'normal';
               el.style.lineHeight = comp.lineHeight || '1.5';
               el.style.textAlign = comp.textAlign || 'left';
               el.style.display = comp.display || 'block';
+              if (comp.display === 'flex') {
+                el.style.flexDirection = comp.flexDirection;
+                el.style.justifyContent = comp.justifyContent;
+                el.style.alignItems = comp.alignItems;
+                el.style.gap = comp.gap;
+              }
+              el.style.width = comp.width;
+              el.style.height = comp.height;
+              el.style.paddingTop = comp.paddingTop;
+              el.style.paddingRight = comp.paddingRight;
+              el.style.paddingBottom = comp.paddingBottom;
+              el.style.paddingLeft = comp.paddingLeft;
+              el.style.marginTop = comp.marginTop;
+              el.style.marginRight = comp.marginRight;
+              el.style.marginBottom = comp.marginBottom;
+              el.style.marginLeft = comp.marginLeft;
+              el.style.borderTopWidth = comp.borderTopWidth;
+              el.style.borderTopStyle = comp.borderTopStyle;
+              el.style.borderBottomWidth = comp.borderBottomWidth;
+              el.style.borderBottomStyle = comp.borderBottomStyle;
             }
           });
 
@@ -184,6 +210,7 @@ export const downloadBillAsPdf = async (bill: Bill) => {
           });
         }
       });
+      console.log("[PDF Debug] 4. html2canvas completed successfully. Canvas generated:", canvas);
     } finally {
       restoreMainWindow();
     }
@@ -194,20 +221,24 @@ export const downloadBillAsPdf = async (bill: Bill) => {
     const pdfWidth = 80;
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
+    console.log("[PDF Debug] 5. jsPDF initialized with dimensions:", { pdfWidth, pdfHeight });
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
       format: [pdfWidth, pdfHeight]
     });
 
+    console.log("[PDF Debug] 6. PDF image added to document...");
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     
     const fileName = `${bill.billNumber || 'bill'}_${bill.party || 'challan'}.pdf`;
+    console.log("[PDF Debug] 7. save() called with filename:", fileName);
     pdf.save(fileName);
 
+    console.log("[PDF Debug] 8. Download completed successfully!");
     toast.success(`Downloaded ${fileName}`, { id: toastId });
   } catch (error) {
-    console.error("Failed to generate PDF:", error);
+    console.error("[PDF Debug ERROR] Failed to generate PDF:", error);
     toast.error("Failed to generate PDF. Please try again.", { id: toastId });
   } finally {
     root.unmount();
