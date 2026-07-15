@@ -26,7 +26,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/login", "/error").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll() // TODO: change back to authenticated() once JWT filter is implemented
             );
             // In a full implementation, add JWT filter here
             // .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

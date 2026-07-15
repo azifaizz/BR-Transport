@@ -1,54 +1,132 @@
 package com.brtransport.backend.controller;
 
 import com.brtransport.backend.entity.Bill;
+import com.brtransport.backend.service.BillService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Collections;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bills")
 public class BillController {
 
+    private final BillService billService;
+
+    @Autowired
+    public BillController(BillService billService) {
+        this.billService = billService;
+    }
+
     @GetMapping
     public ResponseEntity<?> getBills(@RequestParam(defaultValue = "0") int page,
                                       @RequestParam(defaultValue = "20") int size,
                                       @RequestParam(defaultValue = "") String search) {
-        
-        // Mock paginated response matching API_CONTRACT.md
-        Map<String, Object> response = new HashMap<>();
-        response.put("content", Collections.singletonList(
-                new Bill("1", "Acme Co.", new java.util.Date())
-        ));
-        response.put("totalElements", 1);
-        response.put("totalPages", 1);
-        response.put("number", 0);
-        response.put("size", 20);
+        try {
+            List<Bill> bills = billService.getAllBills();
+            
+            // Mock pagination wrapper for frontend compatibility
+            Map<String, Object> response = new HashMap<>();
+            response.put("content", bills);
+            response.put("totalElements", bills.size());
+            response.put("totalPages", 1);
+            response.put("number", 0);
+            response.put("size", bills.size());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error fetching bills: " + e.getMessage() + "\"}");
+        }
+    }
 
-        return ResponseEntity.ok(response);
+    @GetMapping("/deleted")
+    public ResponseEntity<?> getDeletedBills() {
+        try {
+            List<Bill> bills = billService.getDeletedBills();
+            Map<String, Object> response = new HashMap<>();
+            response.put("content", bills);
+            response.put("totalElements", bills.size());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error fetching deleted bills\"}");
+        }
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<?> getStats() {
+        try {
+            return ResponseEntity.ok(billService.getStats());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error fetching stats: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @GetMapping("/next-number")
+    public ResponseEntity<?> getNextBillNumber() {
+        try {
+            return ResponseEntity.ok(Map.of("nextBillNumber", billService.getNextBillNumber()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error fetching next bill number\"}");
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getBill(@PathVariable String id) {
-        return ResponseEntity.ok(new Bill(id, "Acme Co.", new java.util.Date()));
+        try {
+            Bill bill = billService.getBill(id);
+            if (bill != null) {
+                return ResponseEntity.ok(bill);
+            }
+            return ResponseEntity.status(404).body("{\"message\": \"Bill not found\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error fetching bill\"}");
+        }
     }
 
     @PostMapping
     public ResponseEntity<?> createBill(@RequestBody Bill bill) {
-        bill.setId("generated-id");
-        bill.setCreatedAt(new java.util.Date());
-        return ResponseEntity.ok(bill);
+        try {
+            Bill createdBill = billService.createBill(bill);
+            return ResponseEntity.ok(createdBill);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error creating bill: " + e.getMessage() + "\"}");
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBill(@PathVariable String id, @RequestBody Bill bill) {
-        bill.setId(id);
-        return ResponseEntity.ok(bill);
+        try {
+            bill.setId(id);
+            Bill updatedBill = billService.updateBill(id, bill);
+            return ResponseEntity.ok(updatedBill);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error updating bill\"}");
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBill(@PathVariable String id) {
-        return ResponseEntity.noContent().build();
+        try {
+            billService.deleteBill(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error deleting bill\"}");
+        }
+    }
+
+    @PostMapping("/{id}/restore")
+    public ResponseEntity<?> restoreBill(@PathVariable String id) {
+        try {
+            Bill restored = billService.restoreBill(id);
+            if (restored != null) {
+                return ResponseEntity.ok(restored);
+            }
+            return ResponseEntity.status(404).body("{\"message\": \"Bill not found\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error restoring bill\"}");
+        }
     }
 }

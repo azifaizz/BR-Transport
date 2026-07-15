@@ -10,6 +10,33 @@ import java.util.Date;
 @AllArgsConstructor
 public class Bill {
     private String id;
-    private String partyName;
+    
+    // Auto-generated sequential bill number (e.g. 101, 102...)
+    private Long billNumber;
+    
+    private String material;
+    private String party;
+    private String date; // Format: DD/MM/YYYY
+    private String inTime;
+    private String outTime;
+    private String customer;
+    private String vehicleNumber;
+    
+    private Double emptyWeight;
+    private Double loadWeight;
+    private Double netWeight;
+    
+    private String paymentType;
+    private String deliveryType;
+    private String remarks;
+    
+    // System fields
+    private Boolean printStatus;
+    private String createdBy;
     private Date createdAt;
+    
+    // Soft delete fields
+    private Boolean isDeleted = false;
+    private Date deletedAt;
+    private String deletedBy;
 }

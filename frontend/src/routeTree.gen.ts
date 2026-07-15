@@ -13,6 +13,9 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedBillsIndexRouteImport } from './routes/_authenticated.bills.index'
+import { Route as AuthenticatedBillsNewRouteImport } from './routes/_authenticated.bills.new'
+import { Route as AuthenticatedBillsDeletedRouteImport } from './routes/_authenticated.bills.deleted'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -33,16 +36,38 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedBillsIndexRoute = AuthenticatedBillsIndexRouteImport.update({
+  id: '/bills/',
+  path: '/bills/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedBillsNewRoute = AuthenticatedBillsNewRouteImport.update({
+  id: '/bills/new',
+  path: '/bills/new',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedBillsDeletedRoute =
+  AuthenticatedBillsDeletedRouteImport.update({
+    id: '/bills/deleted',
+    path: '/bills/deleted',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/bills/deleted': typeof AuthenticatedBillsDeletedRoute
+  '/bills/new': typeof AuthenticatedBillsNewRoute
+  '/bills/': typeof AuthenticatedBillsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/bills/deleted': typeof AuthenticatedBillsDeletedRoute
+  '/bills/new': typeof AuthenticatedBillsNewRoute
+  '/bills': typeof AuthenticatedBillsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -50,18 +75,25 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/bills/deleted': typeof AuthenticatedBillsDeletedRoute
+  '/_authenticated/bills/new': typeof AuthenticatedBillsNewRoute
+  '/_authenticated/bills/': typeof AuthenticatedBillsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/dashboard'
+  fullPaths:
+    '/' | '/login' | '/dashboard' | '/bills/deleted' | '/bills/new' | '/bills/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard'
+  to: '/' | '/login' | '/dashboard' | '/bills/deleted' | '/bills/new' | '/bills'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/dashboard'
+    | '/_authenticated/bills/deleted'
+    | '/_authenticated/bills/new'
+    | '/_authenticated/bills/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,15 +132,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/bills/': {
+      id: '/_authenticated/bills/'
+      path: '/bills'
+      fullPath: '/bills/'
+      preLoaderRoute: typeof AuthenticatedBillsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/bills/new': {
+      id: '/_authenticated/bills/new'
+      path: '/bills/new'
+      fullPath: '/bills/new'
+      preLoaderRoute: typeof AuthenticatedBillsNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/bills/deleted': {
+      id: '/_authenticated/bills/deleted'
+      path: '/bills/deleted'
+      fullPath: '/bills/deleted'
+      preLoaderRoute: typeof AuthenticatedBillsDeletedRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedBillsDeletedRoute: typeof AuthenticatedBillsDeletedRoute
+  AuthenticatedBillsNewRoute: typeof AuthenticatedBillsNewRoute
+  AuthenticatedBillsIndexRoute: typeof AuthenticatedBillsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedBillsDeletedRoute: AuthenticatedBillsDeletedRoute,
+  AuthenticatedBillsNewRoute: AuthenticatedBillsNewRoute,
+  AuthenticatedBillsIndexRoute: AuthenticatedBillsIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
