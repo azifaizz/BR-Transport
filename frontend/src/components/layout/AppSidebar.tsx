@@ -1,9 +1,12 @@
-import { FileText, LayoutDashboard, Truck } from "lucide-react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { FileText, LayoutDashboard, Truck, LogOut } from "lucide-react";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth/auth-context";
+import { toast } from "sonner";
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -34,7 +37,19 @@ const items = [
 
 export function AppSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isMobile, setOpenMobile } = useSidebar();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      void navigate({ to: "/login", replace: true });
+    } catch {
+      toast.error("Failed to log out");
+    }
+  };
 
   return (
     <Sidebar>
@@ -71,6 +86,20 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="border-t border-sidebar-border p-4">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={handleLogout}
+              className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors font-medium cursor-pointer"
+              tooltip="Sign out"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sign out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

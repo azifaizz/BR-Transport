@@ -231,9 +231,27 @@ export const downloadBillAsPdf = async (bill: Bill) => {
     console.log("[PDF Debug] 6. PDF image added to document...");
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     
-    const fileName = `${bill.billNumber || 'bill'}_${bill.party || 'challan'}.pdf`;
-    console.log("[PDF Debug] 7. save() called with filename:", fileName);
-    pdf.save(fileName);
+    const safeBillNumber = String(bill.billNumber || 'bill').replace(/[\/\\:*?"<>|]/g, '-').trim();
+    const safeParty = String(bill.party || 'challan').replace(/[\/\\:*?"<>|]/g, '-').trim();
+    const fileName = `${safeBillNumber}_${safeParty}.pdf`;
+    console.log("[PDF Debug] 7. Generating explicit PDF blob and downloading:", fileName);
+    
+    // Explicitly output as application/pdf Blob and trigger download via anchor tag
+    // to ensure all browsers respect the exact filename and .pdf extension without modification.
+    const blob = pdf.output('blob');
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      if (document.body.contains(link)) {
+        document.body.removeChild(link);
+      }
+      URL.revokeObjectURL(url);
+    }, 1000);
 
     console.log("[PDF Debug] 8. Download completed successfully!");
     toast.success(`Downloaded ${fileName}`, { id: toastId });

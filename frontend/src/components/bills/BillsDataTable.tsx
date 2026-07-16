@@ -68,7 +68,9 @@ export function BillsDataTable({
   onRestore,
   isLoading = false,
 }: BillsDataTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "billNumber", desc: true }
+  ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [viewBill, setViewBill] = useState<Bill | null>(null);
@@ -81,13 +83,19 @@ export function BillsDataTable({
         header: ({ column }) => (
           <Button
             variant="ghost"
-            className="-ml-4"
+            className="-ml-4 cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Bill No
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
+        sortingFn: (rowA, rowB, columnId) => {
+          const numA = Number(rowA.getValue(columnId)) || 0;
+          const numB = Number(rowB.getValue(columnId)) || 0;
+          if (numA !== numB) return numA - numB;
+          return String(rowA.getValue(columnId) || "").localeCompare(String(rowB.getValue(columnId) || ""));
+        },
         cell: ({ row }) => <div className="font-medium">{row.getValue("billNumber")}</div>,
       },
       {
@@ -95,20 +103,37 @@ export function BillsDataTable({
         header: ({ column }) => (
           <Button
             variant="ghost"
-            className="-ml-4"
+            className="-ml-4 cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Date
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
+        sortingFn: (rowA, rowB, columnId) => {
+          const parseToTime = (val: unknown) => {
+            if (!val) return 0;
+            const str = String(val).trim();
+            const parts = str.split('/');
+            if (parts.length === 3) {
+              const day = parseInt(parts[0], 10);
+              const month = parseInt(parts[1], 10) - 1;
+              const year = parseInt(parts[2], 10);
+              const d = new Date(year, month, day);
+              if (!isNaN(d.getTime())) return d.getTime();
+            }
+            const d = new Date(str);
+            return isNaN(d.getTime()) ? 0 : d.getTime();
+          };
+          return parseToTime(rowA.getValue(columnId)) - parseToTime(rowB.getValue(columnId));
+        },
       },
       {
         accessorKey: "customer",
         header: ({ column }) => (
           <Button
             variant="ghost"
-            className="-ml-4"
+            className="-ml-4 cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Customer
@@ -122,7 +147,7 @@ export function BillsDataTable({
         header: ({ column }) => (
           <Button
             variant="ghost"
-            className="-ml-4"
+            className="-ml-4 cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Material
@@ -133,12 +158,30 @@ export function BillsDataTable({
       {
         accessorKey: "vehicleNumber",
         meta: { className: "hidden md:table-cell" },
-        header: "Vehicle No",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            className="-ml-4 cursor-pointer"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Vehicle No
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
       },
       {
         accessorKey: "paymentType",
         meta: { className: "hidden md:table-cell" },
-        header: "Payment",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            className="-ml-4 cursor-pointer"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Payment
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
       },
     ];
 
@@ -147,7 +190,21 @@ export function BillsDataTable({
         {
           accessorKey: "deletedDate",
           meta: { className: "hidden md:table-cell" },
-          header: "Deleted Date",
+          header: ({ column }) => (
+            <Button
+              variant="ghost"
+              className="-ml-4 cursor-pointer"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              Deleted Date
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          ),
+          sortingFn: (rowA, rowB) => {
+            const timeA = rowA.original.deletedAt ? new Date(rowA.original.deletedAt).getTime() : 0;
+            const timeB = rowB.original.deletedAt ? new Date(rowB.original.deletedAt).getTime() : 0;
+            return timeA - timeB;
+          },
           cell: ({ row }) => {
             const bill = row.original;
             return bill.deletedAt ? format(new Date(bill.deletedAt), "dd/MM/yyyy HH:mm") : "-";
@@ -156,7 +213,16 @@ export function BillsDataTable({
         {
           accessorKey: "deletedBy",
           meta: { className: "hidden md:table-cell" },
-          header: "Deleted By",
+          header: ({ column }) => (
+            <Button
+              variant="ghost"
+              className="-ml-4 cursor-pointer"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              Deleted By
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          ),
         }
       );
     } else {
@@ -164,7 +230,21 @@ export function BillsDataTable({
         {
           accessorKey: "netWeight",
           meta: { className: "hidden md:table-cell" },
-          header: "Net Weight",
+          header: ({ column }) => (
+            <Button
+              variant="ghost"
+              className="-ml-4 cursor-pointer"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              Net Weight
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          ),
+          sortingFn: (rowA, rowB, columnId) => {
+            const a = Number(rowA.getValue(columnId)) || 0;
+            const b = Number(rowB.getValue(columnId)) || 0;
+            return a - b;
+          },
         }
       );
     }

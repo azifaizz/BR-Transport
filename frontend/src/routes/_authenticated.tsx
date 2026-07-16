@@ -1,5 +1,6 @@
-import { createFileRoute, Navigate, Outlet, useLocation } from "@tanstack/react-router";
-import { Loader2, Truck } from "lucide-react";
+import { createFileRoute, Navigate, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
+import { Loader2, Truck, LogOut } from "lucide-react";
+import { toast } from "sonner";
 
 import { useAuth } from "@/lib/auth/auth-context";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -10,8 +11,19 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function AuthenticatedLayout() {
-  const { isAuthenticated, isBootstrapping } = useAuth();
+  const { isAuthenticated, isBootstrapping, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleMobileLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      void navigate({ to: "/login", replace: true });
+    } catch {
+      toast.error("Failed to log out");
+    }
+  };
 
   if (isBootstrapping) {
     return (
@@ -43,6 +55,14 @@ function AuthenticatedLayout() {
               <span className="text-sm font-bold tracking-tight text-sidebar-foreground">BR Transport</span>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={handleMobileLogout}
+            className="ml-auto p-2 text-sidebar-foreground/80 hover:text-destructive transition-colors rounded-md cursor-pointer"
+            title="Sign out"
+          >
+            <LogOut className="h-5 w-5" />
+          </button>
         </header>
         <main className="flex-1 w-full">
           <Outlet />
