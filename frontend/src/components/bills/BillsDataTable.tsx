@@ -129,7 +129,7 @@ export function BillsDataTable({
         },
       },
       {
-        accessorKey: "customer",
+        accessorKey: "party",
         header: ({ column }) => (
           <Button
             variant="ghost"
