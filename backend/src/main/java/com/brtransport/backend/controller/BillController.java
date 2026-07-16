@@ -73,6 +73,16 @@ public class BillController {
         }
     }
 
+    @PostMapping("/reset")
+    public ResponseEntity<?> resetBillsAndCounter(@RequestParam(defaultValue = "101") long nextNumber) {
+        try {
+            billService.resetAllBills(nextNumber);
+            return ResponseEntity.ok(Map.of("message", "Bills cleared and counter reset to " + nextNumber, "nextBillNumber", nextNumber));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error resetting bills: " + e.getMessage() + "\"}");
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getBill(@PathVariable String id) {
         try {

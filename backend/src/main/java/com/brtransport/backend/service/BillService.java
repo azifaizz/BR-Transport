@@ -221,6 +221,20 @@ public class BillService {
         return mockBillCounter;
     }
 
+    public void resetAllBills(long nextNumber) throws ExecutionException, InterruptedException {
+        if (firestore != null) {
+            ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME).get();
+            for (QueryDocumentSnapshot doc : future.get().getDocuments()) {
+                firestore.collection(COLLECTION_NAME).document(doc.getId()).delete();
+            }
+            DocumentReference counterRef = firestore.collection(METADATA_COLLECTION).document(COUNTER_DOC);
+            counterRef.set(Map.of("currentValue", nextNumber - 1));
+        } else {
+            mockBills.clear();
+            mockBillCounter = nextNumber;
+        }
+    }
+
     public void deleteBill(String id) throws ExecutionException, InterruptedException {
         if (firestore != null) {
             DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(id);
